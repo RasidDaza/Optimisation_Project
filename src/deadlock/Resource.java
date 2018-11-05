@@ -4,34 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Resource object which is a general term to represent resources in Deadlock
- * Prevention Problems.
+ * Resource object which is a general term to represent Resources in the
+ * Deadlock Solver Program.
  * 
  * @author Shenal
  *
  */
 public class Resource {
 	
-	private String name = null; // Name of this resource.
-	private List<Timeslot> plan = new ArrayList<Timeslot>(); // Plan for this resource.
-	private List<Timeslot> schedule = new ArrayList<Timeslot>(); // Schedule for this resource.
-	private int time = 0; // Amount of time for a new timeslot to be added to plan/schedule.
-	private int totalTime = 0;	// Total Time for this resource to finish schedule.
-	private int expandedSize = 0; // Account for expanded size of schedule after adding each new timeslot.
+	private String name = null; // Name of this Resource.
+	private List<Timeslot> plan = new ArrayList<Timeslot>(); // Plan for this Resource.
+	private List<Timeslot> schedule = new ArrayList<Timeslot>(); // Schedule for this Resource.
+	private int time = 0; // Amount of time for a new Timeslot to be added to Plan/Schedule.
+	private int totalTime = 0; // Total time for this Resource to finish Schedule.
+	private int expandedSize = 0; // Account for expanded size of Schedule after adding each new Delay Timeslot.
 	
 	/**
 	 * Constructor for Resource Class.
-	 * @param name
+	 * 
+	 * @param name - name of the Resource.
 	 */
 	public Resource(String name) {
 		this.name = name;
 	}
 	
 	/**
-	 * Constructor for Resource Class for reproducing delays in final solution.
-	 * @param newName - name for recreated resource
-	 * @param newSchedule - schedule for recreated resource
-	 * @param newTotalTime - total time for recreated resource
+	 * Special constructor for Resource Class for reproducing delays in the final solution.
+	 * 
+	 * @param newName      - name f recreated Resource.
+	 * @param newSchedule  - Schedule for recreated Resource.
+	 * @param newTotalTime - total time for recreated Resource.
 	 */
 	public Resource(String newName, List<Timeslot> newSchedule, int newTotalTime) {
 		this.name = newName;
@@ -41,6 +43,7 @@ public class Resource {
 	
 	/**
 	 * Get name of Resource.
+	 * 
 	 * @return name
 	 */
 	public String getName() {
@@ -48,7 +51,8 @@ public class Resource {
 	}
 	
 	/**
-	 * Get plan containing all the items which are requesting to use this Resource.
+	 * Get Plan containing all the items which are requesting to use this Resource.
+	 * 
 	 * @return plan
 	 */
 	public List<Timeslot> getPlan() {
@@ -56,7 +60,8 @@ public class Resource {
 	}
 	
 	/**
-	 * Get the schedule containing which items occupied this Resource.
+	 * Get the Schedule containing which items occupied this Resource.
+	 * 
 	 * @return actualSchedule
 	 */
 	public List<Timeslot> getSchedule() {
@@ -64,7 +69,8 @@ public class Resource {
 	}
 	
 	/**
-	 * Get the timespan taken by an Item to use this Resource in a timeslot.
+	 * Get the timespan taken by an Item to use this Resource in a Timeslot.
+	 * 
 	 * @return time
 	 */
 	public int getTime() {
@@ -73,6 +79,7 @@ public class Resource {
 	
 	/**
 	 * Set the timespan duration for the current Item occupying this Resource.
+	 * 
 	 * @param newTime
 	 */
 	public void setTime(int newTime) {
@@ -80,14 +87,16 @@ public class Resource {
 	}
 	
 	/**
-	 * Reset time value in this resource
+	 * Reset time value in this Resource
 	 */
 	public void resetTime() {
 		time = 0;
 	}
 	
 	/**
-	 * Get the total amount of time for the resource to be used by each requesting item.
+	 * Get the total amount of time for the resource to be used by each requesting
+	 * item.
+	 * 
 	 * @return totalTime
 	 */
 	public int getTotalTime() {
@@ -103,6 +112,7 @@ public class Resource {
 	
 	/**
 	 * Number of timeslots in the schedule.
+	 * 
 	 * @return size of schedule
 	 */
 	public int getScheduleSize() {
@@ -110,7 +120,8 @@ public class Resource {
 	}
 	
 	/**
-	 * Add timeslot to plan.
+	 * Add Timeslot to Plan.
+	 * 
 	 * @param newTimeslot - new timeslot added to resource plan
 	 */
 	public void addToPlan(Timeslot newTimeslot) {
@@ -118,7 +129,8 @@ public class Resource {
 	}
 	
 	/**
-	 * Remove timeslot from the resource plan after creating the schedule.
+	 * Remove Timeslot from the Resource Plan after creating the Schedule.
+	 * 
 	 * @param timeslot
 	 */
 	public void removeFromPlan(Timeslot timeslot) {
@@ -126,7 +138,8 @@ public class Resource {
 	}
 	
 	/**
-	 * Add timeslot to schedule archive.
+	 * Add Timeslot to Schedule archive.
+	 * 
 	 * @param newTimeslot
 	 */
 	public void addToSchedule(Timeslot newTimeslot) {
@@ -139,10 +152,10 @@ public class Resource {
 	public void clearSchedule() {
 		schedule.clear();
 	}
-	
+
 	/**
-	 * Add time from new timeslot to the amount of time taken for resource to
-	 * complete the schedule while accounting for delays.
+	 * Add time from new Timeslot to the amount of time taken for Resource to
+	 * complete the Schedule while accounting for delays.
 	 * 
 	 * @param newTime      - time duration of new timeslot.
 	 * @param previousTime - time elapsed for current item in its previous timeslot.
@@ -153,7 +166,8 @@ public class Resource {
 	}
 	
 	/**
-	 * Add time of new timeslot to total time for resource.
+	 * Add time of new Timeslot to total time for Resource.
+	 * 
 	 * @param newTime - time for new timeslot
 	 */
 	public void addTime(int newTime) {
@@ -161,8 +175,9 @@ public class Resource {
 	}
 	
 	/**
-	 * Get current value of expanded size after one or more delays. 
-	 * have been added to the schedule
+	 * Get current value of expanded size after one or more delays. have been added
+	 * to the schedule
+	 * 
 	 * @return expandedSize
 	 */
 	public int getExpandedSize() {

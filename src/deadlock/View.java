@@ -51,20 +51,20 @@ import javafx.scene.text.Font;
  */
 public class View extends Application {
 
-	private Pane root = null; // root pane for GUI
+	private Pane root = null; // Root pane for GUI
 	private Stage stage = null; // Stage for JavaFX window
-	private ItemNode selectedItem = null; // Nominated item for item-resource linking
-	private double originalSceneX, originalSceneY; // Original positions of point pressed inside node
-	private double originalTranslateX, originalTranslateY; // Original positions of pressed nodes
-	private int itemNameNumber = 1; // Unique number the name of each item
-	private int resourceNameNumber = 1; // Unique number for the name of each resource
+	private ItemNode selectedItem = null; // Nominated Item for Item-Resource linking.
+	private double originalSceneX, originalSceneY; // Original positions of point pressed inside a node.
+	private double originalTranslateX, originalTranslateY; // Original spatial position of pressed nodes.
+	private int itemNameNumber = 1; // Unique number for name of each Item.
+	private int resourceNameNumber = 1; // Unique number for the name of each Resource.
 
-	private List<Item> items = new ArrayList<Item>(); // List of items involved in current problem
-	private List<Resource> resources = new ArrayList<Resource>(); // List of resources involved in current problem
+	private List<Item> items = new ArrayList<Item>(); // List containing all Items.
+	private List<Resource> resources = new ArrayList<Resource>(); // List containing all Resources.
 
-	private TextField populationField = null; // Textbox where users specify desired population size
-	private TextField itemField = null; // Textbox where users specify desired number of items
-	private TextField resourceField = null; // Textbox where users specify desired number of resources
+	private TextField populationField = null; // Textfield where users specify desired Population Size.
+	private TextField itemField = null; // Textfield where users specify desired Number of Items.
+	private TextField resourceField = null; // Textfield where users specify desired Number of Resources.
 
 	/**
 	 * Start/main method for JavaFX GUI.
@@ -74,8 +74,7 @@ public class View extends Application {
 		try {
 			root = new Pane();
 			Scene scene = new Scene(root, 1400, 800);
-//			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			scene.getStylesheets().add(getClass().getResource("app.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 			primaryStage.setTitle("Deadlock Solver");
 			createToolbar(root);
 			primaryStage.setScene(scene);
@@ -88,10 +87,10 @@ public class View extends Application {
 	}
 
 	/**
-	 * Create new Item node
+	 * Create new ItemNode in the GUI.
 	 * 
-	 * @param root - root pane
-	 * @return itemNode
+	 * @param root - Root pane
+	 * @return itemNode - newly created ItemNode
 	 */
 	private ItemNode createItemNode(Pane root, String name) {
 		ItemNode itemNode = new ItemNode();
@@ -110,12 +109,12 @@ public class View extends Application {
 		circle.setStroke(Color.CRIMSON);
 		circle.setStrokeWidth(20);
 
-		// Place new item node in random location
+		// Place new ItemNode in random location in GUI.
 		Random r = new Random();
 		itemNode.setTranslateX(r.nextInt(1200) + 1);
 		itemNode.setTranslateY(r.nextInt(600) + 1);
 
-		// Add mouse functionality to item nodes
+		// Add mouse functionality to ItemNodes
 		itemNode.setOnMousePressed(itemOnMousePressedEventHandler);
 		itemNode.setOnMouseDragged(itemOnMouseDraggedEventHandler);
 
@@ -126,15 +125,14 @@ public class View extends Application {
 	}
 
 	/**
-	 * Create new Resource node
+	 * Create new ResourceNode in the GUI.
 	 * 
-	 * @param root - root pane
-	 * @return resourceNode
+	 * @param root - Root pane
+	 * @return resourceNode - newly creayed ResourceNode
 	 */
 	public ResourceNode createResourceNode(Pane root, String name) {
 		ResourceNode resourceNode = new ResourceNode();
 		Label label = null;
-
 		Rectangle rectangle = new Rectangle(200, 120);
 		if (name == null) {
 			label = new Label("R" + resourceNameNumber);
@@ -147,12 +145,12 @@ public class View extends Application {
 		rectangle.setStroke(Color.GOLD);
 		rectangle.setStrokeWidth(10);
 
-		// Place new resource node in random location
+		// Place new ResourceNode in random location in GUI.
 		Random r = new Random();
 		resourceNode.setTranslateX(r.nextInt(1200) + 1);
 		resourceNode.setTranslateY(r.nextInt(600) + 1);
 
-		// Add mouse functionality to resource nodes
+		// Add mouse functionality to ResourceNodes
 		resourceNode.setOnMousePressed(resourceOnMousePressedEventHandler);
 		resourceNode.setOnMouseDragged(resourceOnMouseDraggedEventHandler);
 
@@ -163,16 +161,16 @@ public class View extends Application {
 	}
 
 	/**
-	 * Create one line between an Item and a Resource
+	 * Create one line connection between an Item and a Resource.
 	 * 
 	 * @param c1 - Item to be connected
 	 * @param r1 - Resource to be connected
-	 * @return line
+	 * @return line - new connection between the Item and Resource.
 	 */
 	private NewLine createConnection(ItemNode c1, ResourceNode r1) {
 		NewLine line = new NewLine(c1, r1);
 
-		// Bind one end of line to Item
+		// Bind one end of the line to the ItemNode.
 		line.startXProperty().bind(Bindings.createDoubleBinding(() -> {
 			Bounds b = c1.getBoundsInParent();
 			return b.getMinX() + b.getWidth() / 2;
@@ -182,7 +180,7 @@ public class View extends Application {
 			return b.getMinY() + b.getHeight() / 2;
 		}, c1.boundsInParentProperty()));
 
-		// Bind other end of line to Resource
+		// Bind other end of the line to ResourceNode.
 		line.endXProperty().bind(Bindings.createDoubleBinding(() -> {
 			Bounds b = r1.getBoundsInParent();
 			return b.getMinX() + b.getWidth() / 2;
@@ -202,26 +200,26 @@ public class View extends Application {
 	}
 
 	/**
-	 * Create toolbar on top left of GUI
+	 * Create Toolbar situated on top left of the GUI window.
 	 * 
-	 * @param root - root pane
+	 * @param root - Root pane
 	 */
 	private void createToolbar(Pane root) {
 		ToolBar toolbar = new ToolBar();
-
-		Button button1 = new Button("Add Item"); // Add new item
-		Button button2 = new Button("Add Resource"); // Add new resource
-		// Save current mapping of nodes and edges as a new schedule.
-		Button button3 = new Button("Save Plan"); // Save current plan in csv file to use later
-		Button button4 = new Button("Load Plan"); // Load previously generated plan for all resources
-		Button button5 = new Button("Show Plan"); // Show current state of plan for all resources
-		Button button6 = new Button("Create Random Problem"); // Run GA with random problem setup
-		Button button7 = new Button("Run GA"); // Run GA with problem setup created in GUI
-		Button button8 = new Button("Show Timetable"); // Generate timetable chart of final solution
+		// Create Buttons in Toolbar
+		Button button1 = new Button("Add Item"); // Add new ItemNode
+		Button button2 = new Button("Add Resource"); // Add new ResourceNode
+		// Save current mapping of nodes and line connections to CSV file.
+		Button button3 = new Button("Save Plan");
+		Button button4 = new Button("Load Plan"); // Load previously generated Plan for all Resources.
+		Button button5 = new Button("Show Plan"); // Show current state of Plan for all Resources.
+		Button button6 = new Button("Create Random Problem"); // Run GA with Random Problem Setup.
+		Button button7 = new Button("Run GA"); // Run GA with User Setup Problem (GUI).
+		Button button8 = new Button("Show Timetable"); // Generate timetable chart of final solution.
 		// Create Population Size label and user input box
 		Label populationLabel = new Label("Population Size: ");
 		populationLabel.setStyle("-fx-font-size: 16;");
-		populationField = new TextField("10");
+		populationField = new TextField("100");
 		populationField.setPrefWidth(50);
 		// Create Item Number label and user input box
 		Label itemLabel = new Label("Number of Items: ");
@@ -250,39 +248,39 @@ public class View extends Application {
 	}
 
 	/**
-	 * Event when user clicks item node (red circle).
+	 * Event when user clicks ItemNode (white and red circle).
 	 */
 	EventHandler<MouseEvent> itemOnMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
 		@Override
 		public void handle(MouseEvent e) {
-			ItemNode node = ((ItemNode) (e.getSource())); // current node being moved
+			ItemNode node = ((ItemNode) (e.getSource())); // Get pressed Item
 
-			selectedItem = node; // Nominate this item to be linked to a resource
+			selectedItem = node; // Nominate prssed Item to be linked to a Resource
 
-			// Delete Node if right click button is pressed.
+			// Delete Item if right click button is pressed.
 			if (e.isSecondaryButtonDown()) {
-				List<Node> lines = new ArrayList<Node>(); // List of lines to be deleted
-				// Check if any lines are connected to the soon to be deleted item.
+				List<Node> lines = new ArrayList<Node>(); // List of lines to be deleted.
+				// Check if any lines are connected to the soon to be deleted Item.
 				for (Node c : root.getChildren()) {
 					if (c.getTypeSelector().equals("NewLine")) {
 						NewLine l = (NewLine) c;
-						// Check if the end points of the line are within the item.
+						// Check if the end points of the line are within the Item.
 						if (node.getBoundsInParent().contains(l.getStartX(), l.getStartY())
 								|| node.getBoundsInParent().contains(l.getEndX(), l.getEndY())) {
 							lines.add(c);
 						}
 					}
 				}
-				// Delete all lines that are connected to the soon to be deleted resource.
+				// Delete all lines that are connected to the soon to be deleted Item.
 				for (Node line : lines) {
 					root.getChildren().remove(line);
 				}
 				root.getChildren().remove(e.getSource());
 
-				selectedItem = null; // reset item to resource linking
-				itemNameNumber = 1; // Reset item naming
-				root.getChildren().remove(e.getSource()); // Delete item
+				selectedItem = null; // Reset Item to Resource linking
+				itemNameNumber = 1; // Reset Item naming structure
+				root.getChildren().remove(e.getSource()); // Delete Item
 				return;
 			}
 			originalSceneX = e.getSceneX();
@@ -294,7 +292,7 @@ public class View extends Application {
 	};
 
 	/**
-	 * Event when user drags item node (red circle).
+	 * Event when user drags ItemNode (white and red circle).
 	 */
 	EventHandler<MouseEvent> itemOnMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 
@@ -305,36 +303,35 @@ public class View extends Application {
 			double newTranslateX = originalTranslateX + offsetX;
 			double newTranslateY = originalTranslateY + offsetY;
 
-			StackPane node = ((StackPane) (e.getSource())); // current node being moved
-
+			StackPane node = ((StackPane) (e.getSource())); // Current ItemNode being moved
 			node.setTranslateX(newTranslateX);
 			node.setTranslateY(newTranslateY);
-			selectedItem = null; // reset item to resource linking
+			selectedItem = null; // Reset Item to Resource linking
 		}
 	};
 
 	/**
-	 * Event when user clicks on a resource node (yellow rectangle).
+	 * Event when user clicks on a ResourceNode (white and yellow rectangle).
 	 */
 	EventHandler<MouseEvent> resourceOnMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
 		@Override
 		public void handle(MouseEvent e) {
-			ResourceNode node = ((ResourceNode) (e.getSource())); // Current node being moved
+			ResourceNode node = ((ResourceNode) (e.getSource())); // Get pressed Resource
 			if (selectedItem != null) {
 				NewLine line = createConnection(selectedItem, node);
 			} else {
 				selectedItem = null; // Reset Item-Resource linking
 			}
 
-			// Delete Node if right click button is pressed.
+			// Delete Resource if right click button is pressed.
 			if (e.isSecondaryButtonDown()) {
-				List<Node> lines = new ArrayList<Node>(); // List of lines to be deleted
-				// Check if any lines are connected to the soon to be deleted resource.
+				List<Node> lines = new ArrayList<Node>(); // List of lines to be deleted.
+				// Check if any lines are connected to the soon to be deleted Resource.
 				for (Node c : root.getChildren()) {
 					if (c.getTypeSelector().equals("NewLine")) {
 						NewLine l = (NewLine) c;
-						// Check if the end points of the line are within the resource.
+						// Check if the end points of the line are within the Resource.
 						if (node.getBoundsInParent().contains(l.getStartX(), l.getStartY())
 								|| node.getBoundsInParent().contains(l.getEndX(), l.getEndY())) {
 							lines.add(c);
@@ -358,7 +355,7 @@ public class View extends Application {
 	};
 
 	/**
-	 * Event when user drags a resource node (yellow rectangle).
+	 * Event when user drags a ResourceNode (white and yellow rectangle).
 	 */
 	EventHandler<MouseEvent> resourceOnMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
 
@@ -369,22 +366,21 @@ public class View extends Application {
 			double newTranslateX = originalTranslateX + offsetX;
 			double newTranslateY = originalTranslateY + offsetY;
 
-			StackPane node = ((StackPane) (e.getSource())); // current node being moved
-
+			StackPane node = ((StackPane) (e.getSource())); // Current ResourceNode being moved
 			node.setTranslateX(newTranslateX);
 			node.setTranslateY(newTranslateY);
-
 		}
 	};
 
 	/**
-	 * Event when user clicks on a line (green line).
+	 * Event when user clicks on a line connecting an Item to a Resource (green
+	 * line).
 	 */
 	EventHandler<MouseEvent> lineOnMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
 		@Override
 		public void handle(MouseEvent e) {
-			NewLine line = ((NewLine) (e.getSource())); // current line being deleted
+			NewLine line = ((NewLine) (e.getSource())); // Current line being deleted
 
 			// Delete Node if right click button is pressed.
 			if (e.isSecondaryButtonDown()) {
@@ -399,8 +395,7 @@ public class View extends Application {
 	};
 
 	/**
-	 * Event for creating a new item node in the GUI which represents a new item
-	 * added to the problem setup.
+	 * Event for creating a new ItemNode in the GUI which represents a new Item.
 	 */
 	EventHandler<ActionEvent> addItemButtonEventHandler = new EventHandler<ActionEvent>() {
 
@@ -412,20 +407,20 @@ public class View extends Application {
 	};
 
 	/**
-	 * Event for creating a new resource node in the GUI which represents a new
+	 * Event for creating a new Resource node in the GUI which represents a new
 	 * resource added to the problem setup.
 	 */
 	EventHandler<ActionEvent> addResourceButtonEventHandler = new EventHandler<ActionEvent>() {
 
 		@Override
 		public void handle(ActionEvent e) {
-			selectedItem = null; // reset item to resource linking
+			selectedItem = null; // Reset Item to Resource linking
 			createResourceNode(root, null);
 		}
 	};
 
 	/**
-	 * Event for saving all items, resources and resource plans created in GUI for
+	 * Event for saving all Items, Resources and Resource Plans created in GUI for
 	 * running the algorithm later.
 	 */
 	EventHandler<ActionEvent> savePlanButtonEventHandler = new EventHandler<ActionEvent>() {
@@ -438,8 +433,8 @@ public class View extends Application {
 	};
 
 	/**
-	 * Event for reloading the items, resources and resource plans from a previous
-	 * problem.
+	 * Event for reloading the Items, Resources and Resource Plans from a previously
+	 * setup problem.
 	 */
 	EventHandler<ActionEvent> loadPlanButtonEventHandler = new EventHandler<ActionEvent>() {
 
@@ -459,65 +454,64 @@ public class View extends Application {
 	};
 
 	/**
-	 * Event for showing the current schedule plans in text form for the resources
-	 * created in the GUI.
+	 * Event for showing the current Plans in text form for belonging to each
+	 * Resource created in the GUI.
 	 */
 	EventHandler<ActionEvent> showPlanButtonEventHandler = new EventHandler<ActionEvent>() {
 
 		@Override
 		public void handle(ActionEvent e) {
-			selectedItem = null; // reset item to resource linking
+			selectedItem = null; // reset Item to Resource linking
 			Pane root2 = new Pane();
 			Stage stage2 = new Stage();
 			stage2.setTitle("Current Plan");
-			TextArea ta = new TextArea(); // Box containing Plan
-			ta.setMaxSize(900, 600);
+			TextArea ta = new TextArea(); // Box containing Plan in text form
+			ta.setMaxSize(1100, 600);
 			ta.fontProperty().set(Font.font(30));
-			convertNodes(); // Record which nodes are present and their connections
-			// Print list of timeslots in each resource plan
+			convertNodes(); // Record which nodes are present and their connections.
+			// Print list of Timeslots in each resource plan
 			for (Resource r : resources) {
 				ta.appendText(r.getName() + ": " + r.getPlan().toString() + "\n");
 			}
 			root2.getChildren().add(ta);
-
 			stage2.setScene(new Scene(root2, 1100, 600));
 			stage2.show();
 		}
 	};
 
 	/**
-	 * Event for Starting and Initialising a Random Setup Problem.
+	 * Event for initialising a Random Setup Problem (user lets program make
+	 * randomised problem) and running the Genetic Algorithm on that problem.
 	 */
 	EventHandler<ActionEvent> randomProblemEventHandler = new EventHandler<ActionEvent>() {
 
 		@Override
 		public void handle(ActionEvent e) {
-			int populationSize = Integer.parseInt(populationField.getText()); // Get user specified population size
-			int itemSize = Integer.parseInt(itemField.getText()); // Get user specified population size
-			int resourceSize = Integer.parseInt(resourceField.getText()); // Get user specified population size
+			int populationSize = Integer.parseInt(populationField.getText());
+			int itemSize = Integer.parseInt(itemField.getText());
+			int resourceSize = Integer.parseInt(resourceField.getText());
 			root.getChildren().clear();
 			createToolbar(root);
-//			Population p = new Population(10);
 			Population p = new Population(populationSize, itemSize, resourceSize);
 
-			items = p.getFinalItems(); // Retrieve modified items after GA to view timetable
-			resources = p.getFinalResources(); // Retrieve modified resources after GA to view timetable
+			items = p.getFinalItems(); // Retrieve modified Items after GA to view timetable.
+			resources = p.getFinalResources(); // Retrieve modified Resources after GA to view timetable.
 		}
 	};
 
 	/**
-	 * Event for running Genetic Algorithm using the problem setup in GUI.
+	 * Event for running Genetic Algorithm for User Setup Problems (user used GUI to
+	 * create model of their problem).
 	 */
 	EventHandler<ActionEvent> runAlgorithmButtonEventHandler = new EventHandler<ActionEvent>() {
 
 		@Override
 		public void handle(ActionEvent e) {
-			int populationSize = Integer.parseInt(populationField.getText()); // Get user specified population size
-			convertNodes(); // Get all items and resources currently present to feed them into algorithm
-//			Population p = new Population(2, items, resources);
+			int populationSize = Integer.parseInt(populationField.getText());
+			convertNodes(); // Get all Items and Resources in GUI to feed them into algorithm.
 			Population p = new Population(populationSize, items, resources);
-			items = p.getFinalItems(); // Retrieve modified items after GA to view timetable
-			resources = p.getFinalResources(); // Retrieve modified resources after GA to view timetable
+			items = p.getFinalItems(); // Retrieve modified Items after GA to view timetable
+			resources = p.getFinalResources(); // Retrieve modified Resources after GA to view timetable
 		}
 	};
 
@@ -535,22 +529,23 @@ public class View extends Application {
 	};
 
 	/**
-	 * Get all nodes and lines created and convert them into their equivalent
-	 * objects used for the Genetic Algorithm.
+	 * Get all nodes and lines (connections between nodes) in the GUI and convert
+	 * them into equivalent Item or Resource objects used for the Genetic Algorithm.
 	 */
 	public void mapProblem() {
-		convertNodes();
+		convertNodes(); // Record which nodes are present and their connections.
 		try {
 			saveNewPlan(resources);
 		} catch (IOException e) {
-			// Could not save plans
+			// Could not save Plans
 		}
 	}
 
 	/**
-	 * Save the state of all nodes and line connections on screen into a csv file.
+	 * Save the state of all nodes and line connections currently in the GUI Window
+	 * into a CSV file.
 	 * 
-	 * @param resourceList - list of resources being saved from the GUI.
+	 * @param resourceList - list of Resources from the GUI about to be saved.
 	 * @throws IOException
 	 */
 	public void saveNewPlan(List<Resource> resourceList) throws IOException {
@@ -558,15 +553,13 @@ public class View extends Application {
 		String COMMA_DELIMITER = ",";
 		String NEW_LINE_SEPARATOR = "\n";
 
-		FileWriter fw = new FileWriter("deadlock.csv"); // CHANGE NAME OF SAVED CSV FILE HERE
-
+		FileWriter fw = new FileWriter("deadlock2.csv"); // Name of CSV File to save data.
 		// Write the CSV file header
 		fw.append(FILE_HEADER);
-
 		// Add a new line separator after the header
 		fw.append(NEW_LINE_SEPARATOR);
 
-		// Append timeslot information to csv file
+		// Append timeslot information to CSV file.
 		for (Resource r : resources) {
 			for (Timeslot t : r.getPlan()) {
 				fw.append(String.valueOf(t.getItemName()));
@@ -582,25 +575,26 @@ public class View extends Application {
 	}
 
 	/**
-	 * Load new items, resources and connections from archived csv file.
+	 * Load Items, Resources and Item-Resource connections from archived CSV file in
+	 * the same state when the CSV File was created/saved.
 	 * 
-	 * @param selectedFile - file containing saved data
+	 * @param selectedFile - CSV file containing saved data
 	 */
 	public void loadNewPlan(File selectedFile) {
 		try {
-			List<String> newItemList = new ArrayList<String>(); // List for tracking loaded items
-			List<String> newResourceList = new ArrayList<String>(); // List for tracking loaded resources
-			ItemNode nominatedItemNode = null; // Recreated Items
-			ResourceNode nominatedResourceNode = null; // Recreated Resources
+			List<String> newItemList = new ArrayList<String>(); // List for tracking all loaded Items.
+			List<String> newResourceList = new ArrayList<String>(); // List for tracking all loaded Resources.
+			ItemNode nominatedItemNode = null;
+			ResourceNode nominatedResourceNode = null;
 			BufferedReader br = new BufferedReader(new FileReader(selectedFile));
 			String line = "";
-			br.readLine(); // SKIP FIRST LINE IN CSV FILE (META DATA HEADINGS)
+			br.readLine(); // Skip First Line in CSV File (Meta-data Headings).
 			while ((line = br.readLine()) != null) {
 				// Use comma as separator
 				String[] stuff = line.split(",");
 
-				nominatedItemNode = null;
-				nominatedResourceNode = null;
+				nominatedItemNode = null; // Item about to be recreated in GUI.
+				nominatedResourceNode = null; // Resource about to be recreated in GUI.
 
 				if (newItemList.contains(stuff[0]) && newResourceList.contains(stuff[2]))
 					;
@@ -612,29 +606,28 @@ public class View extends Application {
 							nominatedItemNode = itemNode;
 						}
 					} else if (c.getTypeSelector().equals("ResourceNode")) {
-						// Check for existing resources
+						// Check for existing Resources
 						ResourceNode resourceNode = (ResourceNode) c;
 						if (resourceNode.getName().equals(stuff[2])) {
 							nominatedResourceNode = resourceNode;
 						}
 					}
 				}
-				// If Item Node hasn't already been created, then create it
+				// If ItemNode hasn't already been created, then create it.
 				if (!(newItemList.contains(stuff[0]))) {
-					itemNameNumber = Character.getNumericValue(stuff[0].charAt(1)) + 1; // Change new item names to
-																						// start after loaded item names
+					// Change new Item names to start after loaded Item names.
+					itemNameNumber = Character.getNumericValue(stuff[0].charAt(1)) + 1;
 					nominatedItemNode = createItemNode(root, stuff[0]);
 					newItemList.add(nominatedItemNode.getName());
 				}
-				// If Resource Node hasn't already been created, then create it
+				// If ResourceNode hasn't already been created, then create it.
 				if (!(newResourceList.contains(stuff[2]))) {
-					resourceNameNumber = Character.getNumericValue(stuff[0].charAt(1)) + 1; // Change new resource names
-																							// to start after loaded
-																							// resource names
+					// Change new Resource names to start after loaded Resource names.
+					resourceNameNumber = Character.getNumericValue(stuff[0].charAt(1)) + 1;
 					nominatedResourceNode = createResourceNode(root, stuff[2]);
 					newResourceList.add(nominatedResourceNode.getName());
 				}
-				// Connect lines between items and resources
+				// Connect lines between Items and Resources.
 				createConnection(nominatedItemNode, nominatedResourceNode);
 
 			}
@@ -649,17 +642,13 @@ public class View extends Application {
 	 * Create items, resources and connections based on data from loaded csv file.
 	 */
 	public void convertNodes() {
-		int newTime = 10;
-		// Make random times for each new timeslot UNCOMMENT LATER
-//		Random r = new Random();
-//		int newTime = r.nextInt(20) + 1; // Make random time for timeslot.
-
-		// Clear all current items and resources
+		int newTime = 10; // Time for every loaded Timeslot
+		// Clear all current Items and Resources
 		items.clear();
 		resources.clear();
 
 		for (Node c : root.getChildren()) {
-			// Get item and resource nodes
+			// Get Item and Resource nodes
 			if (c.getTypeSelector().equals("ItemNode")) {
 				Item newItem = new Item(((ItemNode) c).getName());
 				((ItemNode) c).setMatchingItem(newItem);
@@ -671,7 +660,7 @@ public class View extends Application {
 			}
 		}
 
-		// Get lines between nodes
+		// Get lines (Item-Resource connections) between nodes.
 		for (Node c : root.getChildren()) {
 			if (c.getTypeSelector().equals("NewLine")) {
 				NewLine l = (NewLine) c;
@@ -683,11 +672,11 @@ public class View extends Application {
 	}
 
 	/**
-	 * Create the Timetable Chart/Gantt Chart to show the all resource schedules for
-	 * the final solution found by the Genetic Algorithm. Creation of Timetable
-	 * Chart is derived from the JavaFX StackedBarChart and its properties.
+	 * Create the Timetable Chart to show the all Resource Schedules for the final
+	 * solution found by the Genetic Algorithm. Timetable Chart is derived from the
+	 * JavaFX StackedBarChart and its properties.
 	 * 
-	 * @param root - root pane
+	 * @param root - Root pane
 	 */
 	private void createTimetableChart(Pane root) {
 
@@ -699,7 +688,7 @@ public class View extends Application {
 		CategoryAxis yAxis = new CategoryAxis();
 		yAxis.tickLabelFontProperty().set(Font.font(26));
 
-		// Create Stacked Bar Chart
+		// Create regular Stacked Bar Chart
 		StackedBarChart<Number, String> stackedBarChart = new StackedBarChart<>(xAxis, yAxis);
 		stackedBarChart.setTitle("Optimised Deadlock Schedule");
 
@@ -748,9 +737,9 @@ public class View extends Application {
 				}
 			}
 		}
+		stackedBarChart.categoryGapProperty().set(50.0); // Set gap between each Resource Schedule.
 
-		stackedBarChart.categoryGapProperty().set(50.0); // Set gap between each resource schedule (column)
-
+		// Modify Chart Legend
 		for (Node n : stackedBarChart.getChildrenUnmodifiable()) {
 			if (n instanceof Legend) {
 				Legend l = (Legend) n;
@@ -806,17 +795,11 @@ public class View extends Application {
 						li.setText("I10");
 						break;
 					}
-					l.setHgap(10); // Set padding gap between each legend item
+					l.setHgap(10); // Set padding gap between each legend item.
 				}
 			}
 		}
 		stackedBarChart.setPrefSize(1380, 800);
 		root.getChildren().add(stackedBarChart);
-
 	}
-
-//	public static void main(String[] args) {
-//		launch(args);
-//	}
-
 }

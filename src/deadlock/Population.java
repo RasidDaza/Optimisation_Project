@@ -1,5 +1,7 @@
 package deadlock;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,15 +39,14 @@ public class Population {
 	 */
 	public Population(int populationSize, int itemSize, int resourceSize) {
 		startTime = System.currentTimeMillis(); // Start time of running GA
+		// Dummy Manager for starting GA in User Setup mode.
 		firstIndividual = new Manager(itemSize, resourceSize);
 		this.populationSize = populationSize;
-
 		this.items = firstIndividual.getItems();
 		this.resources = firstIndividual.getResources();
 
 		System.out.println("Start----------------------------------------------------");
 		deadlocks = new ArrayList<Manager>(populationSize);
-
 		initialisePopulation(); // Population Initialisation
 
 		System.out.println("Initial Population Fitnesses --------------------");
@@ -54,8 +55,9 @@ public class Population {
 		Random r = new Random();
 		Manager parent1 = null; // First crossover parent.
 		Manager parent2 = null; // Second crossover parent.
+
 		// Start Genetic Algorithm
-		for (int cycles = 0; cycles < 100; cycles++) {
+		for (int cycles = 0; cycles < 10000; cycles++) { // 10000 generations
 
 			// Crossover Fraction = 0.8
 			float crossoverPercentage = r.nextFloat();
@@ -66,8 +68,6 @@ public class Population {
 			List<Manager> parents = selectParents(); // Parent Selection
 			parent1 = parents.get(0);
 			parent2 = parents.get(1);
-//			Manager child1 = new Manager(items, resources);
-//			Manager child2 = new Manager(items, resources);
 			Manager child1 = new Manager(parents.get(0).getItems(), parents.get(0).getResources());
 			Manager child2 = new Manager(parents.get(1).getItems(), parents.get(1).getResources());
 
@@ -83,10 +83,11 @@ public class Population {
 			}
 			// Check if GA is still effective at making progress or not
 			// if there is a high amount of resources
-			if (resources.size() > 100 && cycles % 100 == 0) { // Check every 100 cycles
+			if (resources.size() > 40 && cycles % 100 == 0) { // Check every 100 cycles
 				if (!(checkAlgorithmProgress())) {
 //					System.out.print("Iteration: " + cycles);
 					break; // Finish GA
+
 				}
 			}
 		}
@@ -98,9 +99,9 @@ public class Population {
 	}
 
 	/**
-	 * Constructor for Population class when running a GUI or user defined problem.
-	 * Users use the GUI to setup all items resources and the resource plan that
-	 * will be fed into every individual in the population.
+	 * Constructor for Population class when running program in User Setup mode
+	 * (user defined problem). Users use the GUI to setup all Items, Resources and
+	 * the Resource Plan that will be fed into every individual in the population.
 	 * 
 	 * @param populationSize - fixed number of individuals in the population.
 	 * @param items          - list of items.
@@ -116,19 +117,17 @@ public class Population {
 		deadlocks = new ArrayList<Manager>(populationSize);
 		initialisePopulation(); // Population Initialisation
 		System.out.println("Initial Population Fitnesses --------------------");
-//		printIndividualFitness();
-
+		printIndividualFitness();
 		Random r = new Random();
-		Manager parent1 = null; // First crossover parent.
-		Manager parent2 = null; // Second crossover parent.
-		// Start Genetic Algorithm
-		for (int cycles = 0; cycles < 1000; cycles++) {
+		Manager parent1 = null; // First parent
+		Manager parent2 = null; // Second parent
 
+		// Start Genetic Algorithm
+		for (int cycles = 0; cycles < 10000; cycles++) {
 			// Crossover Percentage = 0.8
 			float crossoverPercentage = r.nextFloat();
 			// Mutation Percentage = 0.2
 			float mutationPercentage = r.nextFloat();
-
 			// Best 2 out of random 5 for selecting parents
 			List<Manager> parents = selectParents(); // Parent Selection
 			parent1 = parents.get(0);
@@ -146,24 +145,24 @@ public class Population {
 				rescoreChildren(child1, child2); // Recheck Child Fitnesses
 				performTournamentSelection(parent1, parent2); // Survivor Selection
 			}
-
-			// Check if GA is still effective at making progress or not
-			if (cycles % 1000 == 0) { // Check every 100 cycles
-				if (!(checkAlgorithmProgress())) {
-					break; // Finish GA
-				}
-			}
+			// Check if GA is still effective at making progress or not. (CURRENTLY
+			// DISABLED)
+//			if (cycles % 100 == 0) { // Check every 100 cycles
+//					if (!(checkAlgorithmProgress())) {
+//						break; // Finish GA
+//					}
+//			}
 		}
 		System.out.println("Final Population Fitnesses --------------------");
-//		printIndividualFitness();
+		printIndividualFitness();
 		System.out.println("Get Final Solution----------------------------");
 		returnSolution(); // Get final solution with highest fitness produced by GA
 		printExecutionTime(); // Get full GA runtime
 	}
 
 	/**
-	 * Create initial population based on predefined population size to start first
-	 * stage of Genetic Algorithm.
+	 * Create initial population based on predefined population size to start
+	 * Genetic Algorithm.
 	 */
 	private void initialisePopulation() {
 		for (int i = 0; i < populationSize; i++) {
@@ -173,8 +172,10 @@ public class Population {
 	}
 
 	/**
-	 * Pick two individuals from population to be two parents for crossover and
-	 * mutation.
+	 * Pick two individuals from population to be two parents for Crossover and
+	 * Mutation. Parents selected via Best 2-out-of-random 5 method. 5 randomly
+	 * picked individuals are extracted from the population and the two individuals
+	 * out of the 5 with the highest fitness are nominated as the two parents.
 	 * 
 	 * @return parents - both parent individuals
 	 */
@@ -208,7 +209,7 @@ public class Population {
 	}
 
 	/**
-	 * Run crossover mutation on two new children individuals to ensure both
+	 * Run Crossover operation on two new children individuals to ensure both
 	 * children inherit genes (structure) from both parents.
 	 * 
 	 * @param parent1 - Parent 1
@@ -218,37 +219,28 @@ public class Population {
 	 * @return newChildren - list containing both (two) children individuals
 	 */
 	private List<Manager> performCrossover(Manager parent1, Manager parent2, Manager child1, Manager child2) {
-		// One Point Crossover
+		// Single Point Crossover
 		Random r = new Random();
-		// Determines which resource will have its schedule swapped between both
-		// children.
+		// Determines which resource will have its schedule swapped between
+		// both children.
 		int crossoverPoint = r.nextInt(resources.size());
 
-//		System.out.println("-------Parent-----------");
-//		printDead21(parent1, parent2);
-//		System.out.println("-------Children-----------");
-//		printDead3(child1, child2);
-
-		// Swap schedules for randomly picked resource
+		// Swap schedules for randomly selected Resource
 		for (int k = 0; k < resources.get(crossoverPoint).getScheduleSize(); k++) {
 			Timeslot temp = parent1.getResources().get(crossoverPoint).getSchedule().get(k);
 			child1.getResources().get(crossoverPoint).getSchedule().set(k,
 					parent2.getResources().get(crossoverPoint).getSchedule().get(k));
 			child2.getResources().get(crossoverPoint).getSchedule().set(k, temp);
 		}
-
-//		System.out.println("-------Modified Children---------");
-//		printDead3(child1, child2);
-
 		List<Manager> newChildren = new ArrayList<Manager>();
 		newChildren.add(child1);
 		newChildren.add(child2);
-		return newChildren; // Feed new children back into population.
+		return newChildren; // Feed two new children into next GA operations.
 	}
 
 	/**
-	 * Run mutation operation on two new children to independently change both
-	 * individuals structure/genotype.
+	 * Run Mutation operation on two new children to independently change both
+	 * individuals genes/structure.
 	 * 
 	 * @param deadlock - child individual
 	 */
@@ -256,9 +248,10 @@ public class Population {
 		// Swap Mutation
 		Random r = new Random();
 		int scheduleIndex = r.nextInt(deadlock.getResources().size()); // Which resource will have its schedule mutated
-		// startPoint (First timeslot in schedule) to be swapped with endPoint (another timeslot in schedule)
-		int startPoint = r.nextInt(deadlock.getResources().get(scheduleIndex).getScheduleSize()); 																							
-		int endPoint = r.nextInt(deadlock.getResources().get(scheduleIndex).getScheduleSize()); 																							
+		// startPoint (First timeslot in schedule) to be swapped with endPoint (another
+		// timeslot in schedule)
+		int startPoint = r.nextInt(deadlock.getResources().get(scheduleIndex).getScheduleSize());
+		int endPoint = r.nextInt(deadlock.getResources().get(scheduleIndex).getScheduleSize());
 		Timeslot temp = deadlock.getResources().get(scheduleIndex).getSchedule().get(startPoint);
 		// Swap the two randomly selected timeslots in the resource schedule
 		deadlock.getResources().get(scheduleIndex).getSchedule().set(startPoint,
@@ -311,24 +304,21 @@ public class Population {
 	}
 
 	/**
-	 * Get the final or at least best effort solution after running Genetic
-	 * Algorithm for user defined or random problem.
+	 * Get the final solution after running Genetic Algorithm. The individual with
+	 * the highest fitness in the final population is chosen as the final solution.
 	 * 
 	 * @return finalSolution - Optimal/Best Effort Solution found after running GA.
 	 */
 	private Manager returnSolution() {
 		int index = 0; // Index of best solution in the population list
-		int fitness = deadlocks.get(0).getResult(); // fitness value of best solution
+		int fitness = deadlocks.get(0).getResult(); // Fitness value of best solution
 		for (int i = 0; i < deadlocks.size(); i++) {
 			if (deadlocks.get(i).getResult() < fitness) {
 				fitness = deadlocks.get(i).getResult();
 				index = i;
 			}
 		}
-
-		System.out.println("Final Result: " + deadlocks.get(index).getResult());
-
-		deadlocks.get(index).setResources(); // Retrieve schedule with delays for each resource in final solution
+		deadlocks.get(index).setResources(); // Retrieve schedule with delays for each resource in final solution.
 		finalItems = deadlocks.get(index).getItems(); // Transfer current Items setup to GUI
 		finalResources = deadlocks.get(index).getResources(); // Transfer current Resources setup to GUI
 		return deadlocks.get(index);
@@ -348,6 +338,20 @@ public class Population {
 			}
 		}
 		return worstSolution;
+	}
+
+	private int returnBestResult() {
+		int index = 0; // Index of best solution in the population list
+		int fitness = deadlocks.get(0).getResult(); // fitness value of best solution
+		for (int i = 0; i < deadlocks.size(); i++) {
+			if (deadlocks.get(i).getResult() < fitness) {
+				fitness = deadlocks.get(i).getResult();
+				index = i;
+			}
+		}
+
+//		System.out.println("Final Result: " + deadlocks.get(index).getResult());
+		return deadlocks.get(index).getResult();
 	}
 
 	/**

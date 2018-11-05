@@ -4,16 +4,17 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 /**
- * Representation of an Item within the GUI. An ItemNode can be considered as a
- * substitute for an Item while the user is defining the Deadlock Prevention
- * related problem in the GUI. Extends StackPane Class/Object from JavaFX.
+ * Object representation of an Item within the GUI. An ItemNode can be
+ * considered as a substitute for an Item while the user is defining the
+ * Deadlock Prevention Problem in the GUI. Extends StackPane
+ * Class/Object from JavaFX.
  * 
  * @author Shenal
  *
  */
 public class ItemNode extends StackPane {
 	
-	// Item object of Item type associated with this item node.
+	// Item object of Item type associated with this ItemNode.
 	private Item correspondingItem = null;
 	
 	/**
@@ -24,7 +25,8 @@ public class ItemNode extends StackPane {
 	}
 	
 	/**
-	 * Get name of the item in this itemnode
+	 * Get name of the Item in this itemnode
+	 * 
 	 * @return name of item node
 	 */
 	public String getName() {
@@ -32,16 +34,18 @@ public class ItemNode extends StackPane {
 	}
 	
 	/**
-	 * Get association item object of the Item type.
-	 * @return item associated with this item node
+	 * Get association Item object of the Item type.
+	 * 
+	 * @return item associated with this ItemNode
 	 */
 	public Item getMatchingItem() {
 		return correspondingItem;
 	}
 	
 	/**
-	 * Establish association with a item object of the Item type.
-	 * @param item associated with this item node
+	 * Establish association with a Item object of the Item type.
+	 * 
+	 * @param item associated with this ItemNode
 	 */
 	public void setMatchingItem(Item item) {
 		correspondingItem = item;

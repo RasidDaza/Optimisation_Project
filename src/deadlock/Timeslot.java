@@ -1,22 +1,23 @@
 package deadlock;
 
 /**
- * A timeslot represents a request made by an item to use a 
- * resource for a requested amount of time.
+ * A Timeslot represents a request made by an Item to use a 
+ * Resource for a requested amount of time.
  * @author Shenal
  *
  */
 public class Timeslot {
 	
-	private String itemName = null; // Name of the item in the timeslot.
-	private Item item = null; // Item in the timeslot.
-	private int time = 0; // Specified Time in the timeslot.
+	private String itemName = null; // Name of the Item in the Timeslot.
+	private Item item = null; // Item in the Timeslot.
+	private int time = 0; // Specified time in the Timeslot.
 	
 	/**
 	 * Constructor for Timeslot class when creating normal Timeslots.
-	 * @param itemName - name of item making request in new timeslot.
-	 * @param item - item making request in new timeslot.
-	 * @param time - amount of time for new timeslot.
+	 * 
+	 * @param itemName - name of Item making request in new Timeslot.
+	 * @param item     - Item making request in new Timeslot.
+	 * @param time     - amount of time for new Timeslot.
 	 */
 	public Timeslot(String itemName, Item item, int time) {
 		this.itemName = itemName;
@@ -25,8 +26,9 @@ public class Timeslot {
 	}
 	
 	/**
-	 * Constructor for Timeslot class when creating Delay Timeslots.
-	 * @param time - amount of time for new timeslot.
+	 * Constructor for Timeslot class specially for creating Delay Timeslots.
+	 * 
+	 * @param time - amount of time for new Timeslot.
 	 */
 	public Timeslot(int time) {
 		this.itemName = "Delay";
@@ -34,36 +36,38 @@ public class Timeslot {
 	}
 	
 	/**
-	 * Get name of the Item in the timeslot.
-	 * @return itemName - name of item in timeslot.
+	 * Get name of the Item in the Timeslot.
+	 * 
+	 * @return itemName - name of Item in Timeslot.
 	 */
 	public String getItemName() {
 		return itemName;
 	}
 	
 	/**
-	 * Get the Item in the timeslot.
-	 * @return item - item in this timeslot.
+	 * Get the Item in the Timeslot.
+	 * 
+	 * @return item - item in this Timeslot.
 	 */
 	public Item getItem() {
 		return item;
 	}
 	
 	/**
-	 * Get the time needed for the Item in the timeslot to use a resource.
-	 * @return time- amount of time for this timeslot.
+	 * Get the time needed for the Item in the Timeslot to use a Resource.
+	 * 
+	 * @return time - amount of time for this Timeslot.
 	 */
 	public int getTime() {
 		return time;
 	}
 	
 	/**
-	 * String representation of a timeslot
+	 * String representation of a Timeslot.
 	 */
 	@Override
 	public String toString() {
-		return "(" + itemName + ", " + time + ")";
-		
+		return "(" + itemName + ", " + time + ")";		
 	}
 
 }

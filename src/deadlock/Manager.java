@@ -15,29 +15,30 @@ import java.util.Random;
  */
 public class Manager {
 
-	private List<Item> items = new ArrayList<Item>(); // List of items
-	private List<Resource> resources = new ArrayList<Resource>(); // List of resources
-	// List of resources unique to this candidate solution
+	private List<Item> items = new ArrayList<Item>(); // List of Items
+	private List<Resource> resources = new ArrayList<Resource>(); // List of Resources
+	// List of Resources unique to this solution.
 	private List<Resource> personalResources = new ArrayList<Resource>();
-	private int result = 0; // Result (fitness) of this candidate solution.
+	private int result = 0; // Result (fitness) of this solution.
 
 	/**
-	 * Constructor for Manager when user selects random problem setup button (create
-	 * Random Setup and run GA on it).
+	 * Constructor for Manager when user runs Random Setup Problem without
+	 * automatically generating Items, Resources and Resource Plan.
 	 * 
 	 * @param itemNumber     - amount of items.
 	 * @param resourceNumber - amount of resources.
 	 */
 	public Manager(int itemNumber, int resourceNumber) {
-		int itemCount = itemNumber; // User input dictates number of items
-		int resourceCount = resourceNumber; // User input dictates number of resources
+		int itemCount = itemNumber; // User input dictates number of items.
+		int resourceCount = resourceNumber; // User input dictates number of resources.
 		initialiseItems(itemCount); // Make new Items
 		initialiseResources(resourceCount); // Make new Resources
-		initialisePlans(); // Create randomised plans for each resource
+		initialisePlans(); // Create randomised plans for each Resource
 	}
 
 	/**
-	 * Constructor for Manager when user uses GUI to setup problem.
+	 * Constructor for Manager when user uses GUI to setup problem (User Setup
+	 * mode).
 	 * 
 	 * @param items     - list of items.
 	 * @param resources - list of resources.
@@ -45,16 +46,16 @@ public class Manager {
 	public Manager(List<Item> items, List<Resource> resources) {
 		this.items = items;
 		this.resources = resources;
-		clearSchedules(); // Reset schedule for the resource.
-		createSchedules(); // Formalise ordering of timeslots for each resource.
-		calculateScheduleTime(); // Calculate times for each resource to be fully utilised.
+		clearSchedules(); // Reset Schedule for the Resource.
+		createSchedules(); // Formalise ordering of Timeslots for each Resource.
+		calculateScheduleTime(); // Calculate times for each Resource to be fully utilised.
 		calculateResult(); // Find fitness of this solution.
-		copyResources(); // Save schedule with delays for this individual permanently.
-		removeDelays(); // Remove Delay timeslots from schedule.
+		copyResources(); // Save Schedule with delays for this individual permanently.
+		removeDelays(); // Remove Delay Timeslots from Schedule.
 	}
 
 	/**
-	 * Get list of items.
+	 * Get list of Items.
 	 * 
 	 * @return items
 	 */
@@ -63,7 +64,7 @@ public class Manager {
 	}
 
 	/**
-	 * Get list of resources.
+	 * Get list of Resources.
 	 * 
 	 * @return resources
 	 */
@@ -116,7 +117,7 @@ public class Manager {
 	}
 
 	/**
-	 * Randomly shuffles timeslots in plan to create new schedule for each resource.
+	 * Randomly shuffles Timeslots in plan to create new schedule for each resource.
 	 */
 	private void createSchedules() {
 		for (Resource resource : resources) {
@@ -136,76 +137,76 @@ public class Manager {
 	public void calculateScheduleTime() {
 
 		List<Timeslot> previousTimeslots = new ArrayList<Timeslot>();
-		boolean delayFlag = false; // Indicate whether there is a delay before this timeslot
-		Timeslot deletedTimeslot = null; // Non-empty if a previous timeslot is to be overwritten with new timeslot (in
-											// previousTimeslots)
-		Timeslot newTimeslot = null; // Latest timeslot to be analysed.
-		int previousTime = 0; // total time of resource containing a previous timeslot.
+		boolean delayFlag = false; // Indicate whether there is a delay before this timeslot.
+		// Non-empty if a previous timeslot is to be overwritten with new timeslot (in
+		// previousTimeslots)
+		Timeslot deletedTimeslot = null;
+		Timeslot newTimeslot = null; // Latest Timeslot to be analysed during Schedule check.
+		int previousTime = 0; // Total time of Resource which contains a previous timeslot.
 
 		List<Timeslot> delays = new ArrayList<Timeslot>();
 		List<Integer> delayIndexes = new ArrayList<Integer>();
 		List<Integer> resourcesIndex = new ArrayList<Integer>();
 
-		for (int i = 0; i < resources.size(); i++) { 							
+		for (int i = 0; i < resources.size(); i++) {
 			for (Resource r : resources) { // For each resource
-				if (r.getSchedule().size() > i) { // Go through each timeslot in a resource
+				if (r.getSchedule().size() > i) { // Go through each Timeslot in a Resource Schedule
 
 					newTimeslot = r.getSchedule().get(i);
 					delayFlag = false;
 					deletedTimeslot = null;
 					previousTime = 0;
 
-					for (Timeslot oldTimeslot : previousTimeslots) { // Check all old timeslots with unique items.
-						// If item in new timeslot is same as item in previous timeslot.
-						if (newTimeslot.getItem() == oldTimeslot.getItem()) { 
-																				
-
-							for (Resource resource : resources) { // Check each resource
-								// Check which resource owns the previous timeslot.
+					for (Timeslot oldTimeslot : previousTimeslots) { // Check all old Timeslots with unique Items.
+						// If item in new Timeslot is same as item in previous timeslot.
+						if (newTimeslot.getItem() == oldTimeslot.getItem()) {
+							for (Resource resource : resources) {
+								// Check which Resource owns the previous timeslot.
 								if (resource.getSchedule().contains(oldTimeslot)
-										&& resource.getTotalTime() > r.getTotalTime()) { 
-																							
+										&& resource.getTotalTime() > r.getTotalTime()) {
+
 									previousTime = resource.getTotalTime(); // Get total time of that resource
 									break;
 								}
 							}
-							// Create delays inbetween each resource schedule
-							// Deal with special cases where previous Time is less than current time
-							if (previousTime != 0) { 		
-								if (previousTime > r.getTotalTime()) { // Need to add delay in this case
+							// Create delays inbetween each Resource Schedule
+							// Deal with special cases where previous time is less than current time
+							if (previousTime != 0) {
+								if (previousTime > r.getTotalTime()) {
 									Timeslot t = new Timeslot(previousTime - r.getTotalTime()); // Make Delay Timeslot
 									delays.add(t);
-									// Show where the new delay timeslot should be placed inside the resource schedule.
+									// Show where the new delay timeslot should be placed inside which Resource
+									// Schedule.
 									delayIndexes.add(r.getSchedule().indexOf(newTimeslot) + r.getExpandedSize());
 									resourcesIndex.add(resources.indexOf(r));
-									r.expandScheduleSize(); // Account for previously added new delay timeslots.
+									r.expandScheduleSize(); // Account for previously added new Delay Timeslots.
 								}
 
 								r.addToTotalTime(newTimeslot.getTime(), previousTime); // Add new time plus time delay.
 								delayFlag = true;
-								deletedTimeslot = oldTimeslot; // Set the soon to be deleted old timeslot.
+								deletedTimeslot = oldTimeslot; // Set the soon to be deleted old Timeslot.
 								break;
 							}
 						}
 					}
 
-					// If there is no delay with the new timeslot
+					// If there is no delay with the new Timeslot.
 					if (delayFlag == false) {
 						r.addTime(newTimeslot.getTime());
 
-						// Replace oldTimeslot with same item as the new timeslot
+						// Replace the oldTimeslot with same Item as the new Timeslot.
 						for (Timeslot oldTimeslot : previousTimeslots) {
 							if (oldTimeslot.getItem() == newTimeslot.getItem()) {
 								deletedTimeslot = oldTimeslot;
 							}
 						}
-						// If the item for the new Timeslot has an exisiting timeslot in previousItems
+						// If the Item for the new Timeslot has an exisiting Timeslot in previousItems.
 						if (deletedTimeslot != null) {
 							previousTimeslots.remove(deletedTimeslot);
 						}
 
 						previousTimeslots.add(newTimeslot);
-					} else { // Delete previous timeslot if they were marked for deletion
+					} else { // Delete previous Timeslot if they were marked for deletion
 						previousTimeslots.remove(deletedTimeslot);
 						previousTimeslots.add(newTimeslot);
 						delayFlag = false;
@@ -282,29 +283,9 @@ public class Manager {
 	}
 
 	/**
-	 * Make permanent copy of schedule for each resource in this individual.
+	 * Make permanent copy of the Schedule for each Resource in an individual.
 	 */
 	public void copyResources() {
-		for (Resource r : resources) {
-			List<Timeslot> personalSchedule = new ArrayList<Timeslot>();
-			for (Timeslot t : r.getSchedule()) {
-				Timeslot timeslot = null;
-				if (t.getItemName().equals("Delay")) {
-					timeslot = new Timeslot(t.getTime());
-				} else {
-					timeslot = new Timeslot(t.getItemName(), t.getItem(), t.getTime());
-				}
-				personalSchedule.add(timeslot);
-			}
-			Resource newResource = new Resource(r.getName(), personalSchedule, r.getTotalTime());
-			personalResources.add(newResource);
-		}
-	}
-	
-	/**
-	 * Make permanent copy of schedule for each resource in this individual.
-	 */
-	public void copyParent() {
 		for (Resource r : resources) {
 			List<Timeslot> personalSchedule = new ArrayList<Timeslot>();
 			for (Timeslot t : r.getSchedule()) {
@@ -330,7 +311,7 @@ public class Manager {
 	}
 
 	/**
-	 * Retrieve original schedule to show final solution for GA.
+	 * Retrieve original schedule to show final solution for Genetic Algorithm.
 	 */
 	public void setResources() {
 		resources = personalResources;

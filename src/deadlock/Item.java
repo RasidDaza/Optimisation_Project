@@ -1,8 +1,8 @@
 package deadlock;
 
 /**
- * Item object which is a general term to represent people, processes, etc, in
- * Deadlock Prevention Problems.
+ * Item object which is a general term to represent people, processes, etc, 
+ * in the Deadlock Solver Program.
  * 
  * @author Shenal
  *
@@ -13,7 +13,8 @@ public class Item {
 	
 	/**
 	 * Constructor for Item class
-	 * @param name
+	 * 
+	 * @param name - name given to the Item.
 	 */
 	public Item(String name) {
 		this.name = name;
@@ -21,6 +22,7 @@ public class Item {
 	
 	/**
 	 * Get name of Item.
+	 * 
 	 * @return name
 	 */
 	public String getName() {
